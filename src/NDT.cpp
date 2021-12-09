@@ -6,6 +6,7 @@
  */
 #include <iostream>
 #include <thread>
+#include <string>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/filters/approximate_voxel_grid.h>
@@ -14,11 +15,39 @@
 
 using namespace std::chrono_literals;
 
+int LoadBinFile(std::string in_file, pcl::PointCloud<pcl::PointXYZ>::Ptr points)
+{
+    // load point cloud file.
+    std::fstream input(in_file.c_str(), std::ios::in | std::ios::binary);// in_file 为点云bin文件
+    if (!input.good())
+    {
+        std::cerr << "Could not read file: " << in_file << std::endl;
+        return -1;
+    }
+    input.seekg(0, std::ios::beg);
+
+    pcl::PointCloud<pcl::PointXYZI>::Ptr points(new pcl::PointCloud<pcl::PointXYZI>);// 点云存储解析bin后的数据
+
+    for (int i = 0; input.good() && !input.eof(); i++)
+    {
+        pcl::PointXYZI point;
+        input.read((char*)&point.x, 3 * sizeof(float));
+        input.read((char*)&point.intensity, sizeof(float));
+
+        points->push_back(point);
+    }
+    input.close();
+    return 0;
+
+}
+
 int main() {
     // Loading first scan of room.
     // 加载首次的房间扫描数据作为目标点云 target_cloud
     pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    if (pcl::io::loadPCDFile<pcl::PointXYZ>("/home/qiuju/CLionProjects/icp_code_practice/room_scan1.pcd", *target_cloud) == -1) {
+    //if (pcl::io::loadPCDFile<pcl::PointXYZ>("../data/full/seq-01/frame-000000.bin", *target_cloud) == -1)
+    if (LoadPCDFile("/home/qiuju/CLionProjects/icp_code_practice/room_scan1.pcd", *target_cloud) == -1)
+    {
         PCL_ERROR ("Couldn't read file room_scan1.pcd \n");
         return (-1);
     }

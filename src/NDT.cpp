@@ -46,7 +46,7 @@ int main() {
     // 加载首次的房间扫描数据作为目标点云 target_cloud
     pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     //if (pcl::io::loadPCDFile<pcl::PointXYZ>("../data/full/seq-01/frame-000000.bin", *target_cloud) == -1)
-    if (LoadBinFile("../data/full/seq-01/frame-000000.bin", *target_cloud) == -1)
+    if (LoadBinFile("../data/full/seq-01/frame-000000.bin", target_cloud) == -1)
     {
         PCL_ERROR ("Couldn't read file room_scan1.pcd \n");
         return (-1);

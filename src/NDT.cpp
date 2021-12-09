@@ -57,7 +57,7 @@ int main() {
     // 加载从新的视角得到的房间第二次扫描数据作为输入源点云 input_cloud
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     //if (pcl::io::loadPCDFile<pcl::PointXYZ>("/home/qiuju/CLionProjects/icp_code_practice/room_scan2.pcd", *input_cloud) == -1) 
-    if (LoadBinFile("../data/full/seq-01/frame-000001.bin", target_cloud) == -1)
+    if (LoadBinFile("../data/full/seq-01/frame-000001.bin", input_cloud) == -1)
     {
         PCL_ERROR ("Couldn't read file room_scan2.pcd \n");
         return (-1);

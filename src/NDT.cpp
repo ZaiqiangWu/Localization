@@ -30,9 +30,9 @@ int LoadBinFile(std::string in_file, pcl::PointCloud<pcl::PointXYZ>::Ptr points)
 
     for (int i = 0; input.good() && !input.eof(); i++)
     {
-        pcl::PointXYZI point;
+        pcl::PointXYZ point;
         input.read((char*)&point.x, 3 * sizeof(float));
-        input.read((char*)&point.intensity, sizeof(float));
+        //input.read((char*)&point.intensity, sizeof(float));
 
         points->push_back(point);
     }

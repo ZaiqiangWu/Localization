@@ -213,29 +213,34 @@ int main() {
      * 为了获得原始云的对齐版本，我们从NDT算法中提取最终转换矩阵并转换原始输入云。
      * 现在，我们可以将该云保存到文件room_scan2_transformed.pcd中，以备将来使用。
      */
-    // Initializing point cloud visualizer
-    pcl::visualization::PCLVisualizer::Ptr viewer_final(new pcl::visualization::PCLVisualizer("3D Viewer"));
-    viewer_final->setBackgroundColor(0, 0, 0);
+    bool is_visualize = false;
+    if (is_visualize)
+    {
+        // Initializing point cloud visualizer
+        pcl::visualization::PCLVisualizer::Ptr viewer_final(new pcl::visualization::PCLVisualizer("3D Viewer"));
+        viewer_final->setBackgroundColor(0, 0, 0);
 
-    // Coloring and visualizing target cloud (red).
-    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> target_color(target_cloud, 255, 0, 0);
-    viewer_final->addPointCloud<pcl::PointXYZ>(target_cloud, target_color, "target cloud");
-    viewer_final->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "target cloud");
+        // Coloring and visualizing target cloud (red).
+        pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> target_color(target_cloud, 255, 0, 0);
+        viewer_final->addPointCloud<pcl::PointXYZ>(target_cloud, target_color, "target cloud");
+        viewer_final->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "target cloud");
 
-    // Coloring and visualizing transformed input cloud (green).
-    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> output_color(output_cloud, 0, 255, 0);
-    viewer_final->addPointCloud<pcl::PointXYZ>(output_cloud, output_color, "output cloud");
-    viewer_final->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "output cloud");
+        // Coloring and visualizing transformed input cloud (green).
+        pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> output_color(output_cloud, 0, 255, 0);
+        viewer_final->addPointCloud<pcl::PointXYZ>(output_cloud, output_color, "output cloud");
+        viewer_final->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "output cloud");
 
-    // Starting visualizer
-    viewer_final->addCoordinateSystem(1.0, "global");
-    viewer_final->initCameraParameters();
+        // Starting visualizer
+        viewer_final->addCoordinateSystem(1.0, "global");
+        viewer_final->initCameraParameters();
 
-    // Wait until visualizer window is closed.
-    while (!viewer_final->wasStopped()) {
-        viewer_final->spinOnce(100);
-        std::this_thread::sleep_for(100ms);
+        // Wait until visualizer window is closed.
+        while (!viewer_final->wasStopped()) {
+            viewer_final->spinOnce(100);
+            std::this_thread::sleep_for(100ms);
+        }
     }
+    
 
     /**
      * This next part is unnecessary but I like to visually see the results of my labors.

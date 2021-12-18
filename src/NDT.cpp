@@ -213,7 +213,7 @@ int main() {
      * 为了获得原始云的对齐版本，我们从NDT算法中提取最终转换矩阵并转换原始输入云。
      * 现在，我们可以将该云保存到文件room_scan2_transformed.pcd中，以备将来使用。
      */
-    bool is_visualize = false;
+    bool is_visualize = true;
     if (is_visualize)
     {
         // Initializing point cloud visualizer

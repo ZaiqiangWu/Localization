@@ -2,7 +2,7 @@
 A lightweight implementation of NDT localization
 
 ## How to download dataset
-Please refer to [here][www.baidu.com]
+Please refer to [here](https://github.com/ZaiqiangWu/Localization/tree/main/download_dataset)
 
 ## How to compile & run
 ```

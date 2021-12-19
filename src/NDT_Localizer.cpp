@@ -12,6 +12,7 @@
 #include <pcl/filters/approximate_voxel_grid.h>
 #include <pcl/registration/ndt.h>
 #include <pcl/visualization/pcl_visualizer.h>
+#include <SeqLoader.h>
 
 using namespace std::chrono_literals;
 

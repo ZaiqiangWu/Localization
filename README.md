@@ -6,7 +6,7 @@ Please refer to [here](https://github.com/ZaiqiangWu/Localization/tree/main/down
 
 ## How to compile & run
 ```
-mkdir build & cd build
+mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 ```

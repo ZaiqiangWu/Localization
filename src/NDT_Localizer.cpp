@@ -49,7 +49,7 @@ int main()
     float orien_error = 0.0f;
     for (int i = 0; i < seqloader.frames.size();i++)
     {
-        cout << "Step: " << i << endl;
+        cout << "Step: " << i << "/"<<seqloader.frames.size()<<endl;
         estimate_poses.push_back(ndt_Localize(init_guess, seqloader.frames[i], seqloader.globalPointCloud));
         init_guess = estimate_poses[i];
         float pe = 0;
@@ -96,7 +96,8 @@ Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess,pcl::PointCloud<pcl::Poi
     // Filtering input scan to roughly 10% of original size to increase speed of registration.
     pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::ApproximateVoxelGrid<pcl::PointXYZ> approximate_voxel_filter;
-    approximate_voxel_filter.setLeafSize(0.2, 0.2, 0.2);
+    float size = 0.2;
+    approximate_voxel_filter.setLeafSize(size,size,size);
     approximate_voxel_filter.setInputCloud(input_cloud);
     approximate_voxel_filter.filter(*filtered_cloud);
     std::cout << "Filtered cloud contains " << filtered_cloud->size()

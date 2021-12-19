@@ -16,53 +16,20 @@
 
 using namespace std::chrono_literals;
 
-int LoadBinFile(std::string in_file, pcl::PointCloud<pcl::PointXYZ>::Ptr points)
-{
-    // load point cloud file.
-    std::fstream input(in_file.c_str(), std::ios::in | std::ios::binary);// in_file 为点云bin文件
-    if (!input.good())
-    {
-        std::cerr << "Could not read file: " << in_file << std::endl;
-        return -1;
-    }
-    input.seekg(0, std::ios::beg);
 
-    //pcl::PointCloud<pcl::PointXYZI>::Ptr points(new pcl::PointCloud<pcl::PointXYZI>);// 点云存储解析bin后的数据
-
-    for (int i = 0; input.good() && !input.eof(); i++)
-    {
-        pcl::PointXYZ point;
-        input.read((char*)&point.x, 3 * sizeof(float));
-        //input.read((char*)&point.intensity, sizeof(float));
-
-        points->push_back(point);
-    }
-    input.close();
-    return 0;
-
-}
 
 int main() {
     // Loading first scan of room.
     // 加载首次的房间扫描数据作为目标点云 target_cloud
+    SeqLoader seqloader("../data/full/seq-01");
     pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    //if (pcl::io::loadPCDFile<pcl::PointXYZ>("../data/full/seq-01/frame-000000.bin", *target_cloud) == -1)
-    if (LoadBinFile("../data/full/seq-01/frame-000000.bin", target_cloud) == -1)
-    {
-        PCL_ERROR ("Couldn't read file room_scan1.pcd \n");
-        return (-1);
-    }
+    target_cloud = seqloader.frames[0];
     std::cout << "Loaded " << target_cloud->size() << " data points from room_scan1.pcd" << std::endl;
 
     // Loading second scan of room from new perspective.
     // 加载从新的视角得到的房间第二次扫描数据作为输入源点云 input_cloud
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    //if (pcl::io::loadPCDFile<pcl::PointXYZ>("/home/qiuju/CLionProjects/icp_code_practice/room_scan2.pcd", *input_cloud) == -1) 
-    if (LoadBinFile("../data/full/seq-01/frame-000001.bin", input_cloud) == -1)
-    {
-        PCL_ERROR ("Couldn't read file room_scan2.pcd \n");
-        return (-1);
-    }
+    input_cloud = seqloader.frames[1];
     std::cout << "Loaded " << input_cloud->size() << " data points from room_scan2.pcd" << std::endl;
     // The above code loads the two pcd file into pcl::PointCloud<pcl::PointXYZ> boost shared pointers.
     // The input cloud will be transformed into the reference frame of the target cloud.

@@ -25,7 +25,7 @@ Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess, pcl::PointCloud<pcl::Po
 int main()
 {
     pcl::PointCloud<pcl::PointXYZ>::Ptr  globalPointCloud(new pcl::PointCloud<pcl::PointXYZ>);
-    SeqLoader seqloader("../data/full/seq-01");
+    SeqLoader seqloader("../data/full/seq-07");
     
     bool is_visualize = false;
     if (is_visualize)

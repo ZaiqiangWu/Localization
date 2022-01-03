@@ -15,18 +15,35 @@
 #include <pcl/visualization/cloud_viewer.h>
 #include <SeqLoader.h>
 #include<cmath>
+#include "timer.h"
+#include <algorithm>
 
 using namespace std::chrono_literals;
 using namespace std;
 void printMatrix(Eigen::Matrix4f mat);
 void evaluateError(Eigen::Matrix4f a, Eigen::Matrix4f b, float& error_pos, float& error_orien);
 Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess, pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud, pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud);
+void ndt_relocalization();
+void ndt_slam();
+float get_median(vector<float> datas);
 
 int main()
 {
-    //pcl::PointCloud<pcl::PointXYZ>::Ptr  globalPointCloud(new pcl::PointCloud<pcl::PointXYZ>);
-    SeqLoader seqloader("../data/full/seq-07");
     
+    ndt_relocalization();
+    
+    return 0;
+}
+void ndt_slam()
+{
+
+}
+
+void ndt_relocalization()
+{
+    //pcl::PointCloud<pcl::PointXYZ>::Ptr  globalPointCloud(new pcl::PointCloud<pcl::PointXYZ>);
+    SeqLoader seqloader("../data/full/seq-01");
+
     bool is_visualize = false;
     if (is_visualize)
     {
@@ -40,34 +57,46 @@ int main()
             std::this_thread::sleep_for(100ms);
         }
     }
-    /*cout << seqloader.frames[0]->size() << endl;
-    cout << seqloader.frames[0]->points[67754].x << endl;
-    cout << seqloader.frames[0]->points[67754].y << endl;
-    cout << seqloader.frames[0]->points[67754].z << endl;*/
+
 
     cout << "Global Point Cloud has " << seqloader.globalPointCloud->size() << " points" << endl;
-    
+
     Eigen::Matrix4f init_guess = seqloader.poses[0];
     vector<Eigen::Matrix4f> estimate_poses;
-    float pos_error = 0.0f;
-    float orien_error = 0.0f;
-    for (int i = 0; i < seqloader.frames.size();i++)
+    vector<float> pos_error;
+    vector<float> orien_error;
+    Timer timer;
+    for (int i = 0; i < seqloader.frames.size(); i++)
     {
-        cout << "Step: " << i << "/"<<seqloader.frames.size()<<endl;
+        cout << "Step: " << i << "/" << seqloader.frames.size() << endl;
+        float t_statr = timer.GetTime();
         estimate_poses.push_back(ndt_Localize(init_guess, seqloader.frames[i], seqloader.globalPointCloud));
+        float t_end = timer.GetTime();
         init_guess = estimate_poses[i];
         float pe = 0;
         float oe = 0;
         evaluateError(estimate_poses[i], seqloader.poses[i], pe, oe);
-        pos_error += pe;
-        orien_error += oe;
-        cout << "pos error: " << pos_error / (i+1) << endl;
-        cout << "orien error: " << orien_error / (i+1) << endl;
+        pos_error.push_back(pe);
+        orien_error.push_back(oe);
+        cout << "median pos error: " << get_median(pos_error) << endl;
+        cout << "median orien error: " << get_median(orien_error) << endl;
+        cout << "elapsed time: " << t_end-t_statr << "s" << endl;
     }
-    
-    
-   
-    return 0;
+
+}
+
+float get_median(vector<float> datas)
+{
+    sort(datas.begin(), datas.end());
+    int size = datas.size();
+    if (size% 2 == 0)
+    {
+        return (datas[size/2-1]+datas[size/2])*0.5f;
+    }
+    else
+    {
+        return datas[size / 2];
+    }
 }
 
 void printMatrix(Eigen::Matrix4f mat)

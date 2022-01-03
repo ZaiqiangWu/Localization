@@ -24,7 +24,7 @@ Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess, pcl::PointCloud<pcl::Po
 
 int main()
 {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr  globalPointCloud(new pcl::PointCloud<pcl::PointXYZ>);
+    //pcl::PointCloud<pcl::PointXYZ>::Ptr  globalPointCloud(new pcl::PointCloud<pcl::PointXYZ>);
     SeqLoader seqloader("../data/full/seq-07");
     
     bool is_visualize = false;
@@ -40,6 +40,10 @@ int main()
             std::this_thread::sleep_for(100ms);
         }
     }
+    /*cout << seqloader.frames[0]->size() << endl;
+    cout << seqloader.frames[0]->points[67754].x << endl;
+    cout << seqloader.frames[0]->points[67754].y << endl;
+    cout << seqloader.frames[0]->points[67754].z << endl;*/
 
     cout << "Global Point Cloud has " << seqloader.globalPointCloud->size() << " points" << endl;
     
@@ -108,14 +112,14 @@ Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess,pcl::PointCloud<pcl::Poi
 
     // Setting scale dependent NDT parameters
     // Setting minimum transformation difference for termination condition.
-    ndt.setTransformationEpsilon(0.01);
+    ndt.setTransformationEpsilon(0.001);
     // Setting maximum step size for More-Thuente line search.
     ndt.setStepSize(0.1);
     //Setting Resolution of NDT grid structure (VoxelGridCovariance).
     ndt.setResolution(1.0);
 
     // Setting max number of registration iterations.
-    ndt.setMaximumIterations(35);
+    ndt.setMaximumIterations(70);
 
     // Setting point cloud to be aligned.
     ndt.setInputSource(filtered_cloud);

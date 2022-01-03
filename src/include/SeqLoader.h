@@ -52,13 +52,24 @@ private:
         input.seekg(0, std::ios::beg);
 
         //pcl::PointCloud<pcl::PointXYZI>::Ptr points(new pcl::PointCloud<pcl::PointXYZI>);// 点云存储解析bin后的数据
-
+        vector<float> datas;
         for (int i = 0; input.good() && !input.eof(); i++)
         {
-            pcl::PointXYZ point;
-            input.read((char*)&point.x, 3 * sizeof(float));
+            //pcl::PointXYZ point;
+            float temp;
+            input.read((char*)&temp, sizeof(float));
             //input.read((char*)&point.intensity, sizeof(float));
 
+            //points->push_back(point);
+            datas.push_back(temp);
+        }
+        int npoints = datas.size() / 4;
+        for (int i = 0; i < npoints; i++)
+        {
+            pcl::PointXYZ point;
+            point.x = datas[i + 0];
+            point.y = datas[i + npoints];
+            point.z = datas[i + 2*npoints];
             points->push_back(point);
         }
         input.close();

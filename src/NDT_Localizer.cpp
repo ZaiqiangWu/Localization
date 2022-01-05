@@ -22,7 +22,7 @@ using namespace std::chrono_literals;
 using namespace std;
 void printMatrix(Eigen::Matrix4f mat);
 void evaluateError(Eigen::Matrix4f a, Eigen::Matrix4f b, float& error_pos, float& error_orien);
-Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess, pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud, pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt);
+Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess, pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud, pcl::PointCloud<pcl::PointXYZ>::Ptr target);
 void ndt_relocalization();
 void ndt_slam();
 float get_median(vector<float> datas);
@@ -57,23 +57,7 @@ void ndt_relocalization()
             std::this_thread::sleep_for(100ms);
         }
     }
-    // Initializing Normal Distributions Transform (NDT).
-    pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt;
-
-    // Setting scale dependent NDT parameters
-    // Setting minimum transformation difference for termination condition.
-    ndt.setTransformationEpsilon(0.001);
-    // Setting maximum step size for More-Thuente line search.
-    ndt.setStepSize(0.1);
-    //Setting Resolution of NDT grid structure (VoxelGridCovariance).
-    ndt.setResolution(1.0);
-
-    // Setting max number of registration iterations.
-    ndt.setMaximumIterations(70);
-
     
-    // Setting point cloud to be aligned to.
-    ndt.setInputTarget(seqloader.globalPointCloud);
 
 
     cout << "Global Point Cloud has " << seqloader.globalPointCloud->size() << " points" << endl;
@@ -89,7 +73,7 @@ void ndt_relocalization()
         cout << "Step: " << i << "/" << seqloader.frames.size() << endl;
         float t_statr = timer.GetTime();
         
-        estimate_poses.push_back(ndt_Localize(init_guess, seqloader.frames[i], ndt));
+        estimate_poses.push_back(ndt_Localize(init_guess, seqloader.frames[i], seqloader.globalPointCloud));
         float t_end = timer.GetTime();
         init_guess = estimate_poses[i];
         float pe = 0;
@@ -143,7 +127,7 @@ void evaluateError(Eigen::Matrix4f a,Eigen::Matrix4f b,float &error_pos,float &e
     
 }
 
-Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess,pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud, pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt)
+Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess,pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud, pcl::PointCloud<pcl::PointXYZ>::Ptr target)
 {
     // Filtering input scan to roughly 10% of original size to increase speed of registration.
     pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud(new pcl::PointCloud<pcl::PointXYZ>);
@@ -155,7 +139,23 @@ Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess,pcl::PointCloud<pcl::Poi
     std::cout << "Filtered cloud contains " << filtered_cloud->size()
         << " data points" << std::endl;
 
-    
+    // Initializing Normal Distributions Transform (NDT).
+    pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt;
+
+    // Setting scale dependent NDT parameters
+    // Setting minimum transformation difference for termination condition.
+    ndt.setTransformationEpsilon(0.001);
+    // Setting maximum step size for More-Thuente line search.
+    ndt.setStepSize(0.1);
+    //Setting Resolution of NDT grid structure (VoxelGridCovariance).
+    ndt.setResolution(1);
+
+    // Setting max number of registration iterations.
+    ndt.setMaximumIterations(70);
+
+
+    // Setting point cloud to be aligned to.
+    ndt.setInputTarget(target);
     // Setting point cloud to be aligned.
     ndt.setInputSource(filtered_cloud);
     

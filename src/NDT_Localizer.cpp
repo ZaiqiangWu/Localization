@@ -144,7 +144,7 @@ Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess,pcl::PointCloud<pcl::Poi
 
     // Setting scale dependent NDT parameters
     // Setting minimum transformation difference for termination condition.
-    ndt.setTransformationEpsilon(0.001);
+    ndt.setTransformationEpsilon(0.00001);
     // Setting maximum step size for More-Thuente line search.
     ndt.setStepSize(0.1);
     //Setting Resolution of NDT grid structure (VoxelGridCovariance).

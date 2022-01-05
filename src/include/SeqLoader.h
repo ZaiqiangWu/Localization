@@ -38,14 +38,7 @@ public:
             pcl::transformPointCloud(*frames[i], temp, poses[i]);
             *globalPointCloud += temp;
         }
-        // Filtering input scan to roughly 10% of original size to increase speed of registration.
-        pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud(new pcl::PointCloud<pcl::PointXYZ>);
-        pcl::ApproximateVoxelGrid<pcl::PointXYZ> approximate_voxel_filter;
-        float size = 0.2;
-        approximate_voxel_filter.setLeafSize(size, size, size);
-        approximate_voxel_filter.setInputCloud(globalPointCloud);
-        approximate_voxel_filter.filter(*filtered_cloud);
-        globalPointCloud = filtered_cloud;
+        
 	}
 private:
     int LoadBinFile(std::string in_file, pcl::PointCloud<pcl::PointXYZ>::Ptr points)

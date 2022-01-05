@@ -63,14 +63,19 @@ void ndt_relocalization()
 
     Eigen::Matrix4f init_guess = seqloader.poses[0];
     vector<Eigen::Matrix4f> estimate_poses;
+    estimate_poses.push_back(init_guess);//test
     vector<float> pos_error;
     vector<float> orien_error;
     Timer timer;
-    for (int i = 0; i < seqloader.frames.size(); i++)
+    for (int i = 1; i < seqloader.frames.size(); i++)
     {
         cout << "Step: " << i << "/" << seqloader.frames.size() << endl;
         float t_statr = timer.GetTime();
-        estimate_poses.push_back(ndt_Localize(init_guess, seqloader.frames[i], seqloader.globalPointCloud));
+        //test
+        pcl::PointCloud<pcl::PointXYZ>::Ptr temp=pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::transformPointCloud(*seqloader.frames[i-1], *temp, init_guess);
+        estimate_poses.push_back(ndt_Localize(init_guess, seqloader.frames[i], temp));
+        //estimate_poses.push_back(ndt_Localize(init_guess, seqloader.frames[i], seqloader.globalPointCloud));
         float t_end = timer.GetTime();
         init_guess = estimate_poses[i];
         float pe = 0;

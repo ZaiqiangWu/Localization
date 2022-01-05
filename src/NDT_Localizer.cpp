@@ -42,7 +42,7 @@ void ndt_slam()
 void ndt_relocalization()
 {
     //pcl::PointCloud<pcl::PointXYZ>::Ptr  globalPointCloud(new pcl::PointCloud<pcl::PointXYZ>);
-    SeqLoader seqloader("../data/full/seq-07");
+    SeqLoader seqloader("../data/full/seq-01");
 
     bool is_visualize = false;
     if (is_visualize)

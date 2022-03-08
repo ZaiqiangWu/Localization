@@ -42,14 +42,14 @@ void ndt_slam()
 void ndt_relocalization()
 {
     //pcl::PointCloud<pcl::PointXYZ>::Ptr  globalPointCloud(new pcl::PointCloud<pcl::PointXYZ>);
-    SeqLoader seqloader("../data/full/seq-01");
+    SeqLoader seqloader("../data/full/seq-07");
 
     bool is_visualize = false;
     if (is_visualize)
     {
         // Initializing point cloud visualizer
         pcl::visualization::CloudViewer viewer("Simple Cloud Viewer");
-        viewer.showCloud(seqloader.globalPointCloud);
+        viewer.showCloud(seqloader.frames[19]);
 
         // Wait until visualizer window is closed.
         while (!viewer.wasStopped()) {

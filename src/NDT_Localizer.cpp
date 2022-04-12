@@ -17,6 +17,8 @@
 #include<cmath>
 #include "timer.h"
 #include <algorithm>
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
 
 using namespace std::chrono_literals;
 using namespace std;
@@ -24,19 +26,43 @@ void printMatrix(Eigen::Matrix4f mat);
 void evaluateError(Eigen::Matrix4f a, Eigen::Matrix4f b, float& error_pos, float& error_orien);
 Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess, pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud, pcl::PointCloud<pcl::PointXYZ>::Ptr target);
 void ndt_relocalization();
-void ndt_slam();
+void json_test();
 float get_median(vector<float> datas);
+float get_mean(vector<float> datas);
 
 int main()
 {
     
+    json_test();
     ndt_relocalization();
     
     return 0;
 }
-void ndt_slam()
+void json_test()
 {
+    json j;
 
+    // add a number that is stored as double (note the implicit conversion of j to an object)
+    j["pi"] = 3.141;
+
+    // add a Boolean that is stored as bool
+    j["happy"][0] = true;
+    j["happy"][1] = false;
+
+    // add a string that is stored as std::string
+    j["name"] = "Niels";
+
+    // add another null object by passing nullptr
+    j["nothing"] = nullptr;
+
+    // add an object inside the object
+    j["answer"]["everything"] = 42;
+
+    // add an array that is stored as std::vector (using an initializer list)
+    vector<float> datas = { 1, 0, 2, 6 };
+    j["list"] = datas;
+    std::ofstream o("pretty.json");
+    o << std::setw(4) << j << std::endl;
 }
 
 void ndt_relocalization()
@@ -59,7 +85,7 @@ void ndt_relocalization()
     }
     
 
-
+    json log;
     cout << "Global Point Cloud has " << seqloader.globalPointCloud->size() << " points" << endl;
 
     Eigen::Matrix4f init_guess = seqloader.poses[0];
@@ -79,11 +105,18 @@ void ndt_relocalization()
         float pe = 0;
         float oe = 0;
         evaluateError(estimate_poses[i], seqloader.poses[i], pe, oe);
+        log["gt"][i] = {seqloader.poses[i](0,3),seqloader.poses[i](1,3), seqloader.poses[i](2,3) };
+        log["pred"][i] = { estimate_poses[i](0,3),estimate_poses[i](1,3), estimate_poses[i](2,3) };
         pos_error.push_back(pe);
         orien_error.push_back(oe);
-        cout << "median pos error: " << get_median(pos_error) << endl;
-        cout << "median orien error: " << get_median(orien_error) << endl;
+        log["location error"][i] = pe;
+        log["rotation error"][i] = oe;
+        cout << "mean pos error: " << get_mean(pos_error) << endl;
+        cout << "mean orien error: " << get_mean(orien_error) << endl;
         cout << "elapsed time: " << t_end-t_statr << "s" << endl;
+
+        std::ofstream o("pretty.json");
+        o << std::setw(4) << log << std::endl;
     }
 
 }
@@ -100,6 +133,17 @@ float get_median(vector<float> datas)
     {
         return datas[size / 2];
     }
+}
+
+float get_mean(vector<float> datas)
+{
+    float result = 0.0f;
+    for (int i = 0; i < datas.size(); i++)
+    {
+        result += datas[i];
+    }
+    result /= datas.size();
+    return result;
 }
 
 void printMatrix(Eigen::Matrix4f mat)

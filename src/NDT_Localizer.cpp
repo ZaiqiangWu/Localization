@@ -115,9 +115,11 @@ void ndt_relocalization()
         cout << "mean orien error: " << get_mean(orien_error) << endl;
         cout << "elapsed time: " << t_end-t_statr << "s" << endl;
 
-        std::ofstream o("pretty.json");
-        o << std::setw(4) << log << std::endl;
+        log["elapsed time"][i] = t_end - t_statr;
+        
     }
+    std::ofstream o("pretty.json");
+    o << std::setw(4) << log << std::endl;
 
 }
 
@@ -165,9 +167,20 @@ void evaluateError(Eigen::Matrix4f a,Eigen::Matrix4f b,float &error_pos,float &e
     Eigen::Vector3f a_pos(a(0,3), a(1,3), a(2,3));
     Eigen::Vector3f b_pos(b(0, 3), b(1, 3), b(2, 3));
     error_pos = (a_pos - b_pos).norm();
-    Eigen::Vector3f a_orien(a(0, 0), a(1, 0), a(2, 0));
-    Eigen::Vector3f b_orien(b(0, 0), b(1, 0), b(2, 0));
-    error_orien = acos(a_orien.dot(b_orien)) / M_PI * 180.0f;
+    float dot_product = 0.0f;
+    float a_norm = 0.0f;
+    float b_norm = 0.0f;
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            dot_product += a(i, j) * b(i, j);
+            a_norm += a(i, j) * a(i, j);
+            b_norm += b(i, j) * b(i, j);
+        }
+    }
+    float cos_value = dot_product / sqrt(a_norm * b_norm);
+    error_orien = acos(cos_value) / M_PI * 180.0f;
     
 }
 

@@ -17,8 +17,7 @@
 #include<cmath>
 #include "timer.h"
 #include <algorithm>
-#include "nlohmann/json.hpp"
-using json = nlohmann::json;
+#include"data_process.h"
 
 using namespace std::chrono_literals;
 using namespace std;
@@ -26,9 +25,7 @@ void printMatrix(Eigen::Matrix4f mat);
 void evaluateError(Eigen::Matrix4f a, Eigen::Matrix4f b, float& error_pos, float& error_orien);
 Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess, pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud, pcl::PointCloud<pcl::PointXYZ>::Ptr target);
 void ndt_relocalization();
-void json_test();
-float get_median(vector<float> datas);
-float get_mean(vector<float> datas);
+
 
 int main()
 {
@@ -37,32 +34,6 @@ int main()
     ndt_relocalization();
     
     return 0;
-}
-void json_test()
-{
-    json j;
-
-    // add a number that is stored as double (note the implicit conversion of j to an object)
-    j["pi"] = 3.141;
-
-    // add a Boolean that is stored as bool
-    j["happy"][0] = true;
-    j["happy"][1] = false;
-
-    // add a string that is stored as std::string
-    j["name"] = "Niels";
-
-    // add another null object by passing nullptr
-    j["nothing"] = nullptr;
-
-    // add an object inside the object
-    j["answer"]["everything"] = 42;
-
-    // add an array that is stored as std::vector (using an initializer list)
-    vector<float> datas = { 1, 0, 2, 6 };
-    j["list"] = datas;
-    std::ofstream o("pretty.json");
-    o << std::setw(4) << j << std::endl;
 }
 
 void ndt_relocalization()
@@ -123,30 +94,6 @@ void ndt_relocalization()
 
 }
 
-float get_median(vector<float> datas)
-{
-    sort(datas.begin(), datas.end());
-    int size = datas.size();
-    if (size% 2 == 0)
-    {
-        return (datas[size/2-1]+datas[size/2])*0.5f;
-    }
-    else
-    {
-        return datas[size / 2];
-    }
-}
-
-float get_mean(vector<float> datas)
-{
-    float result = 0.0f;
-    for (int i = 0; i < datas.size(); i++)
-    {
-        result += datas[i];
-    }
-    result /= datas.size();
-    return result;
-}
 
 void printMatrix(Eigen::Matrix4f mat)
 {
@@ -201,7 +148,7 @@ Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess,pcl::PointCloud<pcl::Poi
 
     // Setting scale dependent NDT parameters
     // Setting minimum transformation difference for termination condition.
-    ndt.setTransformationEpsilon(0.00001);
+    ndt.setTransformationEpsilon(0.001);
     // Setting maximum step size for More-Thuente line search.
     ndt.setStepSize(0.1);
     //Setting Resolution of NDT grid structure (VoxelGridCovariance).

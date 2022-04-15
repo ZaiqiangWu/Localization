@@ -102,12 +102,12 @@ void ndt_relocalization()
     //pcl::PointCloud<pcl::PointXYZ>::Ptr  globalPointCloud(new pcl::PointCloud<pcl::PointXYZ>);
     SeqLoader seqloader("../data/full/seq-07");
 
-    bool is_visualize = false;
+    bool is_visualize = true;
     if (is_visualize)
     {
         // Initializing point cloud visualizer
         pcl::visualization::CloudViewer viewer("Simple Cloud Viewer");
-        viewer.showCloud(seqloader.frames[19]);
+        viewer.showCloud(seqloader.globalPointCloud);
 
         // Wait until visualizer window is closed.
         while (!viewer.wasStopped()) {

@@ -25,7 +25,18 @@ void printMatrix(Eigen::Matrix4f mat);
 void evaluateError(Eigen::Matrix4f a, Eigen::Matrix4f b, float& error_pos, float& error_orien);
 Eigen::Matrix4f ndt_Localize(Eigen::Matrix4f init_guess, pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud, pcl::PointCloud<pcl::PointXYZ>::Ptr target);
 void ndt_relocalization();
-void visualizer(pcl::PointCloud<pcl::PointXYZ>::Ptr output_cloud, pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud)
+std::string makeFixedLength(const int i, const int length=3)
+{
+    std::ostringstream ostr;
+
+    if (i < 0)
+        ostr << '-';
+
+    ostr << std::setfill('0') << std::setw(length) << (i < 0 ? -i : i);
+
+    return ostr.str();
+}
+void visualizer(pcl::PointCloud<pcl::PointXYZ>::Ptr output_cloud, pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud, int i)
 {
     // Initializing point cloud visualizer
     pcl::visualization::PCLVisualizer::Ptr
@@ -49,13 +60,31 @@ void visualizer(pcl::PointCloud<pcl::PointXYZ>::Ptr output_cloud, pcl::PointClou
     // Starting visualizer
     viewer_final->addCoordinateSystem(1.0, "global");
     viewer_final->initCameraParameters();
+    viewer_final->setCameraPosition(-0.31,-0.44,10.5,-0.39,0.92,0.049,1.03,0.65,0.81);
+    viewer_final->setCameraFieldOfView(0.8723599);
+    viewer_final->setCameraClipDistances(0.00522511, 50);
+    vector<pcl::visualization::Camera> cam;
+    viewer_final->saveScreenshot(makeFixedLength(i)+string(".png"));
+    viewer_final->close();
+    
 
     // Wait until visualizer window is closed.
+    /*
     while (!viewer_final->wasStopped())
     {
         viewer_final->spinOnce(100);
         std::this_thread::sleep_for(100ms);
+        viewer_final->getCameras(cam);
+        if (false)
+        {
+            cout << "Cam: " << endl
+                << " - pos: (" << cam[0].pos[0] << ", " << cam[0].pos[1] << ", " << cam[0].pos[2] << ")" << endl
+                << " - view: (" << cam[0].view[0] << ", " << cam[0].view[1] << ", " << cam[0].view[2] << ")" << endl
+                << " - focal: (" << cam[0].focal[0] << ", " << cam[0].focal[1] << ", " << cam[0].focal[2] << ")" << endl
+                << " - fovy: (" << cam[0].fovy << " - clip: (" << cam[0].clip[0] << " , " << cam[0].clip[1] << ")" << endl;
+        }
     }
+    */
 }
 
 
@@ -124,7 +153,7 @@ void ndt_relocalization()
         {
             pcl::PointCloud<pcl::PointXYZ>::Ptr output(new pcl::PointCloud<pcl::PointXYZ>);;
             pcl::transformPointCloud(*seqloader.frames[i], *output, estimate_poses[i]);
-            visualizer(output,seqloader.globalPointCloud);
+            visualizer(output,seqloader.globalPointCloud,i);
         }
         
     }

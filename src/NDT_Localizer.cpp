@@ -64,12 +64,12 @@ void visualizer(pcl::PointCloud<pcl::PointXYZ>::Ptr output_cloud, pcl::PointClou
     viewer_final->setCameraFieldOfView(0.8723599);
     viewer_final->setCameraClipDistances(0.00522511, 50);
     vector<pcl::visualization::Camera> cam;
-    viewer_final->saveScreenshot(makeFixedLength(i)+string(".png"));
-    viewer_final->close();
+    //viewer_final->saveScreenshot(makeFixedLength(i)+string(".png"));
+    //viewer_final->close();
     
 
     // Wait until visualizer window is closed.
-    /*
+    
     while (!viewer_final->wasStopped())
     {
         viewer_final->spinOnce(100);
@@ -84,7 +84,7 @@ void visualizer(pcl::PointCloud<pcl::PointXYZ>::Ptr output_cloud, pcl::PointClou
                 << " - fovy: (" << cam[0].fovy << " - clip: (" << cam[0].clip[0] << " , " << cam[0].clip[1] << ")" << endl;
         }
     }
-    */
+    
 }
 
 
